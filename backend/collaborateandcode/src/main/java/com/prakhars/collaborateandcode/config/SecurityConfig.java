@@ -10,11 +10,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 import com.prakhars.collaborateandcode.filter.JwtAuthFilter;
 import com.prakhars.collaborateandcode.service.UserInfoService;
@@ -27,23 +30,20 @@ public class SecurityConfig {
     private JwtAuthFilter authFilter;
 
     // User Creation
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserInfoService();
-    }
+    @Autowired
+    UserInfoService userDetailsService;
 
     // Configuring HttpSecurity
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.headers().frameOptions().disable();
-        return http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/register", "/login", "/h2-console/**", "**/favicon.ico").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+        return http.headers((headers) -> headers
+                .frameOptions((frameOptions) -> frameOptions.disable())).csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/register", "/login", "/h2-console/**").permitAll()
+                        .anyRequest().authenticated())
+                .securityContext(context -> context.securityContextRepository(delegatingSecurityContextRepository()))
+                .sessionManagement(management -> management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -56,9 +56,16 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityContextRepository delegatingSecurityContextRepository() {
+        return new DelegatingSecurityContextRepository(
+                new RequestAttributeSecurityContextRepository(),
+                new HttpSessionSecurityContextRepository());
+    }
+
+    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }

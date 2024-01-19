@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.prakhars.collaborateandcode.dto.LoginRequest;
 import com.prakhars.collaborateandcode.models.Coder;
 import com.prakhars.collaborateandcode.repository.CoderRepository;
-import com.prakhars.collaborateandcode.service.UserInfoService;
 import com.prakhars.collaborateandcode.utils.JwtService;
 
 @CrossOrigin(maxAge = 3600)
@@ -25,11 +24,9 @@ public class AuthController {
 
     @Autowired
     private final CoderRepository coderRepository;
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserInfoService service;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtService jwtService;
