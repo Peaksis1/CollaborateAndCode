@@ -1,7 +1,7 @@
 // registration.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { RegistrationService } from '../registration.service';
+import { RegistrationService } from '../service/registration/registration.service';
 
 @Component({
   selector: 'app-registration',

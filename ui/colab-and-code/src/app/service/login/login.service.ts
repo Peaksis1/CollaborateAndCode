@@ -19,7 +19,7 @@ export class LoginService {
     );
   }
   private handleAuthentication(response: any): void {
-    const token = response.token; // Adjust accordingly based on your backend response
+    const token = response; // Adjust accordingly based on your backend response
     this.jwtService.setToken(token);
   }
 }

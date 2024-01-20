@@ -10,8 +10,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.prakhars.collaborateandcode.dto.LoginRequest;
 import com.prakhars.collaborateandcode.models.Coder;
@@ -44,6 +46,11 @@ public class AuthController {
         coder.setPassword(passwordEncoder.encode(coder.getPassword()));
         coderRepository.save(coder);
         return ResponseEntity.ok("Registration successful.");
+    }
+
+    @GetMapping("/isJwtValid")
+    public ResponseEntity<Boolean> isJwtValid(@RequestHeader(name = "Authorization") String token) {
+        return ResponseEntity.ok(true);
     }
 
     @PostMapping("/login")
