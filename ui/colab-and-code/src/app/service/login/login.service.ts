@@ -1,6 +1,6 @@
 // login.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { JwtService } from '../jwt/jwt.service';
 
@@ -14,7 +14,13 @@ export class LoginService {
 
   login(username: string, password: string): Observable<any> {
     const loginRequest = { username, password };
-    return this.http.post(this.apiUrl, loginRequest, { responseType: 'text' }).pipe(
+    return this.http.post(this.apiUrl, loginRequest,
+      {
+        headers: new HttpHeaders({
+          'Jwt-Interceptor-Skip': 'true'
+        }), responseType: 'text'
+      }
+    ).pipe(
       tap(response => this.handleAuthentication(response))
     );
   }

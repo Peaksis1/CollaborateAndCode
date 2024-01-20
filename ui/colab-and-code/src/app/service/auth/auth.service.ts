@@ -24,13 +24,9 @@ export class AuthService {
   }
 
   async getResponse(): Promise<boolean | undefined> {
-    const token = this.jwtService.getToken();
 
     try {
       const response = await this.http.get(this.apiUrl, {
-        headers: new HttpHeaders({
-          'Authorization': 'Bearer ' + token
-        }),
         responseType: 'text'
       }).toPromise();
 

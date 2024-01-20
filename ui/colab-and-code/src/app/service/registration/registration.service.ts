@@ -11,8 +11,12 @@ export class RegistrationService {
   constructor(private http: HttpClient) { }
 
   register(username: string, password: string): Observable<any> {
+
     const registrationRequest = { username, password };
     const httpOptions: Object = {
+      headers: new HttpHeaders({
+        'Jwt-Interceptor-Skip': 'true'
+      }),
       responseType: 'text'
     };
     return this.http.post(this.apiUrl, registrationRequest, httpOptions);
